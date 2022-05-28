@@ -27,7 +27,10 @@ DEBUG = True
 
 APPEND_SLASH = True
 
-ALLOWED_HOSTS = [" janmwnip.us-south.cf.appdomain.cloud"]
+ALLOWED_HOSTS = [
+    "localhost",
+    'janmwnip.us-south.cf.appdomain.cloud',
+]
 
 
 # Application definition
