@@ -18,11 +18,11 @@ import uuid
 # - Any other fields you would like to include in car make model
 # - __str__ method to print a car make object
 class CarMake(models.Model):
-    name = models.CharField(null=False, max_length=30, default='name')
+    make_name = models.CharField(null=False, max_length=30, default='name')
     description = models.CharField(max_length=1000)
 
     def __str__(self):
-        return "Name: " + self.name + "," + \
+        return "Name: " + self.make_name + "," + \
                "Description: " + self.description
 
 # <HINT> Create a Car Model model `class CarModel(models.Model):`:
@@ -34,7 +34,8 @@ class CarMake(models.Model):
 # - Any other fields you would like to include in car model
 # - __str__ method to print a car make object
 class CarModel(models.Model):
-    make = models.ForeignKey(CarMake, on_delete=models.CASCADE)
+    make_name = models.ForeignKey(CarMake, on_delete=models.CASCADE)
+    model_name = models.CharField(null=False, max_length=30, default='name')
     dealer_id = models.IntegerField(default=0)
     SEDAN = 'sedan'
     SUV = 'suv'
@@ -53,8 +54,9 @@ class CarModel(models.Model):
     year=models.DateField(null=False)
 
     def __str__(self):
-        return "Make: " + self.make + "," + \
-               "Dealer ID: " + self.dealer_id + "," + \
+        return "Make: " + self.make_name + "," + \
+               "Model: " + self.model_name + "," + \
+               "Dealer ID: " + str(self.dealer_id) + "," + \
                "Type: " + self.car_type + "," + \
                "Year of Manufacture: " + self.year
 
