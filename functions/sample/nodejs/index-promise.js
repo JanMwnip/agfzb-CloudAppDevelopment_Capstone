@@ -5,6 +5,7 @@
 const { CloudantV1 } = require('@ibm-cloud/cloudant');
 const { IamAuthenticator } = require('ibm-cloud-sdk-core');
 
+/*
 function main(params) {
 
     const authenticator = new IamAuthenticator({ apikey: params.IAM_API_KEY })
@@ -12,6 +13,17 @@ function main(params) {
       authenticator: authenticator
     });
     cloudant.setServiceUrl(params.COUCH_URL);
+
+    let dbListPromise = getDbs(cloudant);
+    return dbListPromise;
+}
+*/
+
+function main(params) {
+    const cloudant = Cloudant({
+        url: params.COUCH_URL,
+        plugins: { iamauth: { iamApiKey: params.IAM_API_KEY } }
+    });
 
     let dbListPromise = getDbs(cloudant);
     return dbListPromise;
