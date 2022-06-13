@@ -3,6 +3,12 @@ import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
 
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson.natural_language_understanding_v1 \
+    import Features, EmotionOptions
+
+
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
@@ -78,7 +84,7 @@ def get_dealer_reviews_from_cf(url, dealer_id):
             dealer_view_obj = DealerReview(dealership=dealer_view_doc["dealership"], name=dealer_view_doc["name"], purchase=dealer_view_doc["purchase"],
                                    review=dealer_view_doc["review"], purchase_date=dealer_view_doc["purchase_date"], car_make=dealer_view_doc["car_make"],
                                    car_model=dealer_view_doc["car_model"],
-                                   car_year=dealer_view_doc["car_year"], sentiment=analyze_review_sentiments(dealer_view_doc["review"]), id=dealer_view_doc["id"])
+                                   car_year=dealer_view_doc["car_year"], sentiment=analyze_review_sentiments(url), id=dealer_view_doc["id"])#dealer_view_doc["review"]
             results.append(dealer_view_obj)
 
     return results
@@ -97,15 +103,31 @@ def analyze_review_sentiments(dealerreview):
     #)
     params = dict()
     #params["text"] = kwargs[str(dealerreview)]
-    params["text"] = str(dealerreview)#kwargs["text"]
-    params["version"] = "2022-04-07"#kwargs["2022-04-07"]
-    params["features"] = "1"#kwargs["1"]
-    params["return_analyzed_text"] = True#kwargs[True]
-    response = requests.get(URL, params=params, headers={'Content-Type': 'application/json'},
-                                    auth=HTTPBasicAuth('apikey', api_key))
+    #params["text"] = str(dealerreview)#kwargs["text"]
+    #params["version"] = "2022-04-07"#kwargs["2022-04-07"]
+    #params["features"] = "sentiment"#kwargs["1"]
+    #params["return_analyzed_text"] = True#kwargs[True]
+    #params = json.dumps({"text": str(dealerreview), "features": {"sentiment": {}}})
+    #response = requests.get(URL, params=params, headers={'Content-Type': 'application/json'},
+    #                                auth=HTTPBasicAuth('apikey', api_key))
+
+    authenticator = IAMAuthenticator(api_key)
+    natural_language_understanding = NaturalLanguageUnderstandingV1(
+        version='2022-04-07',
+        authenticator=authenticator
+    )
+
+    natural_language_understanding.set_service_url(URL)
+
+    response = natural_language_understanding.analyze(
+        html=str(dealerreview),
+        features=Features(emotion=EmotionOptions(entities=EntitiesOptions(emotion=True, sentiment=True, limit=2)))).get_result()
+
     try:
-        return response.json()['sentiment']['document']['label']
+        #return response.json()['sentiment']['document']['label']
+        #return 'Happy'
+        return json.dumps(response, indent=2)
     except KeyError:
-        return 'neutral'
+        return 'bad'#neutral
 
 

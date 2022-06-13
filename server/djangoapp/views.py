@@ -126,10 +126,10 @@ def get_dealer_details(request, dealer_id):
         # Get reviews from the URL and dealer id
         dealerreviews = get_dealer_reviews_from_cf(url,dealer_id)
         # Concat all dealer's review
-        # dealer_reviews = ' '.join([dealerreview.review for dealerreview in dealerreviews])
+        dealer_reviews = ' '.join([dealerreview.sentiment for dealerreview in dealerreviews])
         #dealer_reviews = dealerreviews.review + "-" + dealerreviews.sentiment
         # Return a list of dealer review
-        return HttpResponse(dealerreviews)
+        return HttpResponse(dealer_reviews)
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
